@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -14,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.coolweather.app.R;
+import com.coolweather.app.service.AutoUpdateService;
 import com.coolweather.app.util.HttpCallbackListener;
 import com.coolweather.app.util.HttpUtil;
 import com.coolweather.app.util.Utility;
@@ -130,6 +132,7 @@ public class WeatherActivity extends Activity implements View.OnClickListener {
         HttpUtil.sendHttpRequest(address, new HttpCallbackListener() {
             @Override
             public void onFinish(final String response) {
+                Log.i("----------------CW",response);
                 if ("countyCode".equals(type)) {
                     if (!TextUtils.isEmpty(response)) {
 // 从服务器返回的数据中解析出天气代号
@@ -140,9 +143,9 @@ public class WeatherActivity extends Activity implements View.OnClickListener {
                         }
                     }
                 } else if ("weatherCode".equals(type)) {
-// 处理服务器返回的天气信息
-                    Utility.handleWeatherResponse(WeatherActivity.this,
-                            response);
+                    // 处理服务器返回的天气信息
+
+                    Utility.handleWeatherResponse(WeatherActivity.this,response);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -176,5 +179,7 @@ public class WeatherActivity extends Activity implements View.OnClickListener {
         currentDateText.setText(prefs.getString("current_date", ""));
         weatherInfoLayout.setVisibility(View.VISIBLE);
         cityNameText.setVisibility(View.VISIBLE);
+        Intent intent = new Intent(this, AutoUpdateService.class);
+        startService(intent);
     }
 }
